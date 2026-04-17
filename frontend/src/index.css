@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 300;
+  }
+  body {
+    background-color: #fafaf9;
+    color: #0a0a0a;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    background: #0a0a0a;
+    color: #fafaf9;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-ink text-paper px-8 py-3 text-xs uppercase tracking-widest2 font-medium hover:bg-neutral-700 transition-colors;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 border border-ink text-ink px-8 py-3 text-xs uppercase tracking-widest2 font-medium hover:bg-ink hover:text-paper transition-colors;
+  }
+  .section-title {
+    @apply text-3xl sm:text-4xl font-serif tracking-tight;
+  }
+  .eyebrow {
+    @apply text-[11px] uppercase tracking-widest2 text-neutral-500 font-medium;
+  }
+  .container-x {
+    @apply mx-auto max-w-7xl px-5 sm:px-8;
+  }
+  .input {
+    @apply w-full border border-neutral-300 bg-white px-4 py-2.5 text-sm focus:outline-none focus:border-ink transition-colors;
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.4s ease-out;
+}
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { scrollbar-width: none; }
