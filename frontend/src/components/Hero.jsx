@@ -8,7 +8,7 @@ export default function Hero() {
           <p className="eyebrow">Est. Osogbo · Nationwide delivery</p>
           <h1 className="mt-6 text-5xl sm:text-6xl lg:text-7xl font-serif leading-[1.05] tracking-tight">
             Curated thrift.<br />
-            <span className="italic">Imported edit.</span>
+            <span className="italic">Imported wears.</span>
           </h1>
           <p className="mt-8 text-neutral-600 max-w-xl leading-relaxed">
             Baggy jeans, bum shorts, jorts, maxi skirts and imported wears — thoughtfully sourced, fairly priced. We bridge affordable thrift and fashion so you always have access to the trends you love.
