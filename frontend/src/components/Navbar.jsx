@@ -10,33 +10,40 @@ const links = [
   { to: '/wishlist', label: 'Wishlist' },
 ];
 
+const CATEGORY_LINKS = [
+  { slug: 'baggy-jeans', label: 'Baggy jeans' },
+  { slug: 'bum-shorts', label: 'Bum shorts' },
+  { slug: 'jorts', label: 'Jorts' },
+  { slug: 'maxi-skirts', label: 'Maxi skirts' },
+  { slug: 'imported', label: 'Imported' },
+];
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [count, setCount] = useState(() => getWishlist().length);
   const { pathname } = useLocation();
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   useEffect(() => onWishlistChange(() => setCount(getWishlist().length)), []);
-  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => { setOpen(false); }, [pathname]);
+
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    if (!open) return;
+    const scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
+    };
   }, [open]);
 
   return (
-    <header className={clsx(
-      'sticky top-0 z-40 bg-paper/90 backdrop-blur border-b transition-colors',
-      scrolled ? 'border-neutral-200' : 'border-transparent'
-    )}>
+    <header className="relative z-40 bg-paper border-b border-neutral-200">
       <div className="container-x flex items-center justify-between h-14 sm:h-20">
-        <Link to="/" className="flex items-baseline gap-2 group" aria-label="Reesha home">
+        <Link to="/" className="flex items-baseline gap-2" aria-label="Reesha home">
           <span className="font-serif italic text-xl sm:text-2xl tracking-tight">Reesha</span>
           <span className="hidden sm:block text-[10px] uppercase tracking-widest2 text-neutral-500">
             Wears &middot; Thrift
@@ -75,70 +82,66 @@ export default function Navbar() {
           </Link>
           <button
             className="md:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
-            onClick={() => setOpen((o) => !o)}
-            aria-label={open ? 'Close menu' : 'Open menu'}
-            aria-expanded={open}
+            onClick={() => setOpen(true)}
+            aria-label="Open menu"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              {open ? (
-                <path d="M6 6l12 12M18 6L6 18" />
-              ) : (
-                <>
-                  <path d="M4 7h16" />
-                  <path d="M4 12h16" />
-                  <path d="M4 17h16" />
-                </>
-              )}
+              <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
             </svg>
           </button>
         </div>
       </div>
 
-      {/* Mobile drawer */}
-      <div
-        className={clsx(
-          'md:hidden fixed inset-x-0 top-14 bottom-0 bg-paper border-t border-neutral-200 transition-transform duration-300 ease-out',
-          open ? 'translate-y-0' : '-translate-y-full pointer-events-none'
-        )}
-      >
-        <nav className="container-x py-8 flex flex-col gap-1">
-          {links.map((l) => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              end={l.end}
+      {open && (
+        <div className="md:hidden fixed inset-0 z-50 bg-paper flex flex-col animate-[fade-in_0.2s_ease-out]">
+          <div className="flex items-center justify-between h-14 container-x border-b border-neutral-200">
+            <Link to="/" onClick={() => setOpen(false)} className="font-serif italic text-xl">Reesha</Link>
+            <button
               onClick={() => setOpen(false)}
-              className={({ isActive }) => clsx(
-                'py-4 border-b border-neutral-200 font-serif text-2xl tracking-tight transition-colors',
-                isActive ? 'text-ink italic' : 'text-neutral-500'
-              )}
+              aria-label="Close menu"
+              className="p-2 -mr-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
-              {l.label}
-            </NavLink>
-          ))}
-          <div className="mt-8">
-            <p className="eyebrow mb-3">Categories</p>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { slug: 'baggy-jeans', label: 'Baggy jeans' },
-                { slug: 'bum-shorts', label: 'Bum shorts' },
-                { slug: 'jorts', label: 'Jorts' },
-                { slug: 'maxi-skirts', label: 'Maxi skirts' },
-                { slug: 'imported', label: 'Imported' },
-              ].map((c) => (
-                <Link
-                  key={c.slug}
-                  to={`/shop?category=${c.slug}`}
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+          </div>
+
+          <nav className="flex-1 overflow-y-auto container-x py-6">
+            <div className="flex flex-col">
+              {links.map((l) => (
+                <NavLink
+                  key={l.to}
+                  to={l.to}
+                  end={l.end}
                   onClick={() => setOpen(false)}
-                  className="px-3 py-2 text-[11px] uppercase tracking-widest2 border border-neutral-300 text-neutral-600"
+                  className={({ isActive }) => clsx(
+                    'py-4 border-b border-neutral-200 font-serif text-2xl tracking-tight',
+                    isActive ? 'text-ink italic' : 'text-neutral-500'
+                  )}
                 >
-                  {c.label}
-                </Link>
+                  {l.label}
+                </NavLink>
               ))}
             </div>
-          </div>
-        </nav>
-      </div>
+            <div className="mt-8">
+              <p className="eyebrow mb-3">Categories</p>
+              <div className="flex flex-wrap gap-2">
+                {CATEGORY_LINKS.map((c) => (
+                  <Link
+                    key={c.slug}
+                    to={`/shop?category=${c.slug}`}
+                    onClick={() => setOpen(false)}
+                    className="px-3 py-2 text-[11px] uppercase tracking-widest2 border border-neutral-300 text-neutral-600"
+                  >
+                    {c.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
