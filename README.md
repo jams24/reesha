@@ -4,7 +4,7 @@ Minimal-luxury e-commerce site for **Reesha Wears and Thrift** — a thrift & im
 
 - **Checkout**: Pre-filled WhatsApp orders to `+2348161518807`
 - **Frontend**: React + Vite + Tailwind
-- **Backend**: Node/Express + MongoDB (Mongoose)
+- **Backend**: Node/Express + PostgreSQL (Prisma ORM)
 - **Image hosting**: Cloudinary
 - **Admin**: Email/password login, product CRUD with image uploads
 
@@ -12,112 +12,120 @@ Minimal-luxury e-commerce site for **Reesha Wears and Thrift** — a thrift & im
 
 ```
 reesha/
-├── backend/        # Express + MongoDB API (deploy on Railway / Render)
-└── frontend/       # React + Vite + Tailwind (deploy on Vercel / Netlify)
+├── backend/        # Express + Prisma + Postgres (serves the frontend build in prod)
+└── frontend/       # React + Vite + Tailwind
 ```
+
+In production the Express server also serves `frontend/dist/*`, so **one deployment** covers both API and storefront.
 
 ---
 
-## 1. Backend setup
+## 1. Local setup
 
 ### Prerequisites
 - Node 18+
-- A MongoDB database (free tier at [MongoDB Atlas](https://www.mongodb.com/atlas))
-- A Cloudinary account (free tier at [cloudinary.com](https://cloudinary.com))
+- PostgreSQL running locally (or a cloud Postgres URL)
+- A Cloudinary account ([free tier](https://cloudinary.com))
 
-### Steps
+### Backend
 ```bash
 cd backend
 npm install
-cp .env.example .env          # then fill in the values
-npm run dev                   # starts on http://localhost:5000
+cp .env.example .env          # then fill in values
+npm run db:push               # creates tables in Postgres
+npm run seed:demo             # optional: loads 8 demo products + a test admin
+npm run dev                   # starts on http://localhost:5001
 ```
 
 `.env` keys:
 ```
-PORT=5000
-MONGO_URI=mongodb+srv://...
-JWT_SECRET=change_me_to_a_long_random_string
+PORT=5001
+DATABASE_URL=postgresql://USER@localhost:5432/reesha
+JWT_SECRET=paste_a_long_random_string_here
 CORS_ORIGIN=http://localhost:5173
 CLOUDINARY_CLOUD_NAME=...
 CLOUDINARY_API_KEY=...
 CLOUDINARY_API_SECRET=...
 ```
 
-### Create the first admin user
-```bash
-npm run seed:admin
-# enter email, name, password when prompted
-```
+Demo admin (after `seed:demo`): `admin@reesha.local` / `reesha123`
 
-### API endpoints
-| Method | Path | Auth | Purpose |
-|--------|------|------|---------|
-| POST | `/api/auth/login` | public | admin login → `{ token, admin }` |
-| GET  | `/api/auth/me` | admin | current admin |
-| GET  | `/api/products` | public | list (supports `category`, `size`, `minPrice`, `maxPrice`, `search`, `featured`, `page`, `limit`) |
-| GET  | `/api/products/:slug` | public | product by slug |
-| POST | `/api/products` | admin | create (multipart, `images` field) |
-| PUT  | `/api/products/:id` | admin | update (multipart; `keepImages` is a JSON array of URLs to keep) |
-| DELETE | `/api/products/:id` | admin | delete product + its Cloudinary images |
-
----
-
-## 2. Frontend setup
-
+### Frontend
 ```bash
 cd frontend
 npm install
-cp .env.example .env          # defaults point at local backend
+cp .env.example .env
 npm run dev                   # starts on http://localhost:5173
 ```
 
-`.env` keys:
-```
-VITE_API_URL=http://localhost:5000/api
-VITE_WHATSAPP_NUMBER=2348161518807
-VITE_INSTAGRAM_HANDLE=reeshawears
-```
+---
 
-### Routes
-- `/` — home
-- `/shop` — catalog with filters (category, size, price, search)
-- `/product/:slug` — product detail with Order-on-WhatsApp
-- `/about` — brand story + contact
-- `/wishlist` — saved items (localStorage)
-- `/admin/login` — staff login
-- `/admin` — product dashboard (protected)
+## 2. API reference
+
+| Method | Path | Auth | Purpose |
+|--------|------|------|---------|
+| POST | `/api/auth/login` | public | returns `{ token, admin }` |
+| GET  | `/api/auth/me` | admin | current admin from JWT |
+| GET  | `/api/products` | public | list; supports `category`, `size`, `minPrice`, `maxPrice`, `search`, `featured`, `page`, `limit` |
+| GET  | `/api/products/:slug` | public | fetch by slug |
+| POST | `/api/products` | admin | create (multipart/form-data with `images`) |
+| PUT  | `/api/products/:id` | admin | update (multipart; `keepImages` = JSON array of URLs to keep) |
+| DELETE | `/api/products/:id` | admin | delete product + Cloudinary images |
 
 ---
 
-## 3. Deployment
+## 3. Deploy to ServerMe
 
-### Backend → Railway (or Render)
-1. Push `backend/` to a GitHub repo
-2. On Railway, create a new project → Deploy from repo → pick the backend folder
-3. Set all env vars from `.env.example`
-4. Railway auto-builds on push. Note the public URL (e.g. `https://reesha-api.up.railway.app`)
+The backend serves the built frontend, so everything ships as **one ServerMe project**.
 
-### Frontend → Vercel
-1. Push `frontend/` to a GitHub repo
-2. Import the project on Vercel → framework **Vite**
-3. Set env vars:
-   - `VITE_API_URL=https://<your-railway-url>/api`
-   - `VITE_WHATSAPP_NUMBER=2348161518807`
-   - `VITE_INSTAGRAM_HANDLE=<your handle>`
-4. Add the Vercel URL to the backend's `CORS_ORIGIN` (comma-separated if multiple)
-5. Deploy
+### Provision a Postgres database
+In your ServerMe dashboard, create a Postgres addon / service for the project. ServerMe exposes a `DATABASE_URL` (either auto-injected or shown as a connection string you paste into env vars).
+
+### Project config
+| Field | Value |
+|---|---|
+| **Project Name** | `reesha` |
+| **Subdomain** | `reesha` (gives `reesha.serverme.site`) |
+| **Root Directory** | *(leave empty — repo root)* |
+| **Node Version** | `20` |
+| **Install Command** | `npm ci --prefix backend && npm ci --prefix frontend` |
+| **Build Command** | `npm run build --prefix frontend` |
+| **Start Command** | `npm start --prefix backend` |
+| **Port** | `0` (auto — server reads `$PORT`) |
+
+The backend's `npm start` runs `prisma db push` before booting, so the Postgres schema is created on first deploy and kept in sync on later deploys.
+
+### Environment variables
+```
+DATABASE_URL=postgresql://user:pass@host:5432/dbname    # from ServerMe Postgres
+JWT_SECRET=paste_a_long_random_string
+CLOUDINARY_CLOUD_NAME=...
+CLOUDINARY_API_KEY=...
+CLOUDINARY_API_SECRET=...
+CORS_ORIGIN=https://reesha.serverme.site
+```
+
+Generate a JWT secret:
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+### Seed the first admin user
+After the first deploy, set `DATABASE_URL` in your **local** `backend/.env` temporarily to the production value, then run:
+```bash
+cd backend
+npm run seed:admin
+```
+This inserts your admin into the live Postgres. Switch `DATABASE_URL` back to local Postgres when you're done.
 
 ---
 
 ## 4. Post-launch checklist
 
-- [ ] Run `npm run seed:admin` against production Mongo
-- [ ] Sign in at `/admin/login`, add 6–10 real products with photos
-- [ ] Test "Order on WhatsApp" flow on a real phone
-- [ ] Replace Instagram placeholder with real handle (or embed an Elfsight / SnapWidget in `InstagramFeed.jsx`)
-- [ ] Supply a real logo SVG (currently a simple "R" favicon)
-- [ ] Optional: point a custom domain at Vercel (e.g. reeshawears.com)
+- [ ] Add real products with photos via `/admin`
+- [ ] Replace Instagram placeholder — set `VITE_INSTAGRAM_HANDLE` and embed a SnapWidget/Elfsight feed
+- [ ] Point a custom domain (e.g. `reeshawears.com`) at the ServerMe project
+- [ ] Test "Order on WhatsApp" on a real phone
 
 ## Brand reference
 

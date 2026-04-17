@@ -4,7 +4,7 @@ const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-const connectDB = require('./config/db');
+const prisma = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 
@@ -21,7 +21,7 @@ app.use('/api/products', productRoutes);
 const frontendDist = path.resolve(__dirname, '../../frontend/dist');
 if (fs.existsSync(frontendDist)) {
   app.use(express.static(frontendDist));
-  app.get('*', (req, res, next) => {
+  app.get('*', (req, res) => {
     if (req.path.startsWith('/api')) return res.status(404).json({ error: 'Not found' });
     res.sendFile(path.join(frontendDist, 'index.html'));
   });
@@ -34,9 +34,13 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5001;
 
-connectDB().then(() => {
-  app.listen(PORT, () => console.log(`Reesha running on :${PORT}`));
-}).catch((err) => {
-  console.error('Failed to start:', err.message);
-  process.exit(1);
-});
+(async () => {
+  try {
+    await prisma.$connect();
+    console.log('Postgres connected');
+    app.listen(PORT, () => console.log(`Reesha running on :${PORT}`));
+  } catch (err) {
+    console.error('Failed to start:', err.message);
+    process.exit(1);
+  }
+})();

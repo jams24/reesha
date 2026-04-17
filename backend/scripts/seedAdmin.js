@@ -1,38 +1,17 @@
 require('dotenv').config();
 const readline = require('readline');
 const bcrypt = require('bcryptjs');
-const mongoose = require('mongoose');
-const Admin = require('../src/models/Admin');
+const prisma = require('../src/config/db');
 
-function ask(rl, q, hidden = false) {
-  return new Promise((resolve) => {
-    if (!hidden) return rl.question(q, (a) => resolve(a));
-    const stdin = process.openStdin();
-    process.stdout.write(q);
-    let value = '';
-    const onData = (char) => {
-      char = char.toString();
-      if (char === '\n' || char === '\r' || char === '\u0004') {
-        stdin.removeListener('data', onData);
-        stdin.pause();
-        process.stdout.write('\n');
-        resolve(value);
-      } else if (char === '\u0003') {
-        process.exit();
-      } else {
-        value += char;
-      }
-    };
-    stdin.on('data', onData);
-  });
+function ask(rl, q) {
+  return new Promise((resolve) => rl.question(q, resolve));
 }
 
 (async () => {
-  if (!process.env.MONGO_URI) {
-    console.error('MONGO_URI not set in .env');
+  if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL not set in .env');
     process.exit(1);
   }
-  await mongoose.connect(process.env.MONGO_URI);
 
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   const email = (await ask(rl, 'Admin email: ')).trim().toLowerCase();
@@ -46,20 +25,18 @@ function ask(rl, q, hidden = false) {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const existing = await Admin.findOne({ email });
-  if (existing) {
-    existing.passwordHash = passwordHash;
-    existing.name = name;
-    await existing.save();
-    console.log(`Updated existing admin: ${email}`);
-  } else {
-    await Admin.create({ email, passwordHash, name });
-    console.log(`Created admin: ${email}`);
-  }
 
-  await mongoose.disconnect();
+  const admin = await prisma.admin.upsert({
+    where: { email },
+    update: { passwordHash, name },
+    create: { email, passwordHash, name },
+  });
+
+  console.log(`${admin.createdAt.getTime() === admin.updatedAt.getTime() ? 'Created' : 'Updated'} admin: ${admin.email}`);
+  await prisma.$disconnect();
   process.exit(0);
-})().catch((e) => {
+})().catch(async (e) => {
   console.error(e);
+  await prisma.$disconnect().catch(() => {});
   process.exit(1);
 });
