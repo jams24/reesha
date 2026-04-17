@@ -31,8 +31,7 @@ COPY backend backend
 COPY --from=frontend-builder /app/frontend/dist frontend/dist
 
 ENV NODE_ENV=production
-ENV PORT=5001
-EXPOSE 5001
+EXPOSE 3000
 
 WORKDIR /app/backend
 CMD ["npm", "start"]

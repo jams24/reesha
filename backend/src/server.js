@@ -32,13 +32,13 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.message || 'Server error' });
 });
 
-const PORT = process.env.PORT || 5001;
+const PORT = Number(process.env.PORT) || 3000;
 
 (async () => {
   try {
     await prisma.$connect();
     console.log('Postgres connected');
-    app.listen(PORT, () => console.log(`Reesha running on :${PORT}`));
+    app.listen(PORT, '0.0.0.0', () => console.log(`Reesha running on :${PORT}`));
   } catch (err) {
     console.error('Failed to start:', err.message);
     process.exit(1);
