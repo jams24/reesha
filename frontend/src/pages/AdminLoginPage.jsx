@@ -27,12 +27,12 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-5">
+    <div className="min-h-screen flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm">
-        <Link to="/" className="block text-center font-serif italic text-3xl mb-10">Reesha</Link>
-        <div className="border border-neutral-200 bg-white p-8">
+        <Link to="/" className="block text-center font-serif italic text-2xl sm:text-3xl mb-8 sm:mb-10">Reesha</Link>
+        <div className="border border-neutral-200 bg-white p-6 sm:p-8">
           <p className="eyebrow">Staff only</p>
-          <h1 className="mt-2 font-serif text-2xl">Admin sign in</h1>
+          <h1 className="mt-2 font-serif text-xl sm:text-2xl">Admin sign in</h1>
 
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <div>
@@ -40,6 +40,8 @@ export default function AdminLoginPage() {
               <input
                 type="email"
                 autoComplete="email"
+                autoCapitalize="off"
+                autoCorrect="off"
                 required
                 className="input"
                 value={email}
@@ -65,7 +67,7 @@ export default function AdminLoginPage() {
             </button>
           </form>
         </div>
-        <Link to="/" className="mt-6 block text-center text-[11px] uppercase tracking-widest2 text-neutral-500 hover:text-ink">
+        <Link to="/" className="mt-6 block text-center text-[11px] uppercase tracking-widest2 text-neutral-500 hover:text-ink py-2">
           ← Back to store
         </Link>
       </div>

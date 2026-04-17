@@ -19,12 +19,13 @@ export default function WishlistHeart({ product, className }) {
       type="button"
       onClick={onClick}
       aria-label={active ? 'Remove from wishlist' : 'Add to wishlist'}
+      aria-pressed={active}
       className={clsx(
-        'w-9 h-9 flex items-center justify-center bg-paper/90 backdrop-blur border border-neutral-200 hover:border-ink transition-colors',
+        'w-10 h-10 flex items-center justify-center bg-paper/90 backdrop-blur border border-neutral-200 hover:border-ink transition-colors',
         className
       )}
     >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
         <path d="M12 20.4s-7.5-4.6-7.5-10.2a4.5 4.5 0 0 1 8-2.8 4.5 4.5 0 0 1 8 2.8c0 5.6-8.5 10.2-8.5 10.2z" />
       </svg>
     </button>

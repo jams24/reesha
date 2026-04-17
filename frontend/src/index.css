@@ -6,10 +6,13 @@
   html {
     font-family: 'Inter', system-ui, sans-serif;
     font-weight: 300;
+    -webkit-text-size-adjust: 100%;
   }
   body {
     background-color: #fafaf9;
     color: #0a0a0a;
+    min-height: 100vh;
+    min-height: 100svh;
   }
   h1, h2, h3, h4 {
     font-family: 'Playfair Display', Georgia, serif;
@@ -20,26 +23,39 @@
     background: #0a0a0a;
     color: #fafaf9;
   }
+  /* Bigger tap targets on mobile */
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Prevent iOS from auto-zooming on input focus */
+  input, textarea, select {
+    font-size: 16px;
+  }
+  @media (min-width: 640px) {
+    input, textarea, select {
+      font-size: 14px;
+    }
+  }
 }
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 bg-ink text-paper px-8 py-3 text-xs uppercase tracking-widest2 font-medium hover:bg-neutral-700 transition-colors;
+    @apply inline-flex items-center justify-center gap-2 bg-ink text-paper px-6 sm:px-8 py-3 sm:py-3 text-[11px] sm:text-xs uppercase tracking-widest2 font-medium hover:bg-neutral-700 transition-colors min-h-[44px];
   }
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 border border-ink text-ink px-8 py-3 text-xs uppercase tracking-widest2 font-medium hover:bg-ink hover:text-paper transition-colors;
+    @apply inline-flex items-center justify-center gap-2 border border-ink text-ink px-6 sm:px-8 py-3 text-[11px] sm:text-xs uppercase tracking-widest2 font-medium hover:bg-ink hover:text-paper transition-colors min-h-[44px];
   }
   .section-title {
-    @apply text-3xl sm:text-4xl font-serif tracking-tight;
+    @apply text-2xl sm:text-3xl lg:text-4xl font-serif tracking-tight;
   }
   .eyebrow {
-    @apply text-[11px] uppercase tracking-widest2 text-neutral-500 font-medium;
+    @apply text-[10px] sm:text-[11px] uppercase tracking-widest2 text-neutral-500 font-medium;
   }
   .container-x {
-    @apply mx-auto max-w-7xl px-5 sm:px-8;
+    @apply mx-auto max-w-7xl px-4 sm:px-8;
   }
   .input {
-    @apply w-full border border-neutral-300 bg-white px-4 py-2.5 text-sm focus:outline-none focus:border-ink transition-colors;
+    @apply w-full border border-neutral-300 bg-white px-4 py-3 sm:py-2.5 text-base sm:text-sm focus:outline-none focus:border-ink transition-colors;
   }
 }
 
@@ -53,3 +69,11 @@
 
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { scrollbar-width: none; }
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.sticky-cta {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 0.75rem);
+}

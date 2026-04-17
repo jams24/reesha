@@ -15,25 +15,25 @@ export default function ProductCard({ product }) {
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-neutral-400 text-xs uppercase tracking-widest2">
+          <div className="w-full h-full flex items-center justify-center text-neutral-400 text-[10px] uppercase tracking-widest2">
             No image
           </div>
         )}
-        <WishlistHeart product={product} className="absolute top-3 right-3" />
+        <WishlistHeart product={product} className="absolute top-2 right-2 sm:top-3 sm:right-3" />
         {product.stock === 0 && (
-          <div className="absolute bottom-3 left-3 bg-ink text-paper text-[10px] uppercase tracking-widest2 px-2 py-1">
+          <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-ink text-paper text-[9px] sm:text-[10px] uppercase tracking-widest2 px-2 py-1">
             Sold
           </div>
         )}
       </div>
-      <div className="mt-3 flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="text-sm font-medium truncate">{product.name}</h3>
-          <p className="text-[11px] uppercase tracking-widest2 text-neutral-500 mt-0.5">
+      <div className="mt-3 flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-xs sm:text-sm font-medium truncate">{product.name}</h3>
+          <p className="text-[10px] sm:text-[11px] uppercase tracking-widest2 text-neutral-500 mt-0.5">
             {product.category?.replace('-', ' ')}
           </p>
         </div>
-        <p className="text-sm whitespace-nowrap">{formatNaira(product.price)}</p>
+        <p className="text-xs sm:text-sm whitespace-nowrap font-medium">{formatNaira(product.price)}</p>
       </div>
     </Link>
   );
