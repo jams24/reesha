@@ -1,4 +1,4 @@
-const HANDLE = import.meta.env.VITE_INSTAGRAM_HANDLE || 'reeshawears';
+const HANDLE = import.meta.env.VITE_INSTAGRAM_HANDLE || 'reesha_wears31';
 
 export default function InstagramFeed() {
   const url = `https://instagram.com/${HANDLE}`;
