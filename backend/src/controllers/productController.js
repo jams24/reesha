@@ -14,6 +14,16 @@ function parseSizes(value) {
   return String(value).split(',').map((s) => s.trim()).filter(Boolean);
 }
 
+function parseJSONArray(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) return parsed;
+  } catch {}
+  return [];
+}
+
 function coerceBool(v) {
   return v === true || v === 'true';
 }
@@ -71,10 +81,10 @@ exports.create = async (req, res) => {
   const sizes = parseSizes(req.body.sizes);
   const category = normalizeCategory(req.body.category || 'other');
 
-  let imageUrls = [];
+  const imageUrls = parseJSONArray(req.body.imageUrls);
   if (req.files?.length) {
     const uploads = await Promise.all(req.files.map((f) => uploadBuffer(f.buffer)));
-    imageUrls = uploads.map((u) => u.secure_url);
+    imageUrls.push(...uploads.map((u) => u.secure_url));
   }
 
   const slug = await buildUniqueSlug(name);
@@ -114,7 +124,7 @@ exports.update = async (req, res) => {
 
   let images = existing.images;
   if (req.body.keepImages !== undefined) {
-    const keep = parseSizes(req.body.keepImages);
+    const keep = parseJSONArray(req.body.keepImages);
     const removed = existing.images.filter((u) => !keep.includes(u));
     await Promise.all(removed.map((u) => destroyByUrl(u)));
     images = keep;
