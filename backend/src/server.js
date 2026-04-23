@@ -13,6 +13,7 @@ const app = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN?.split(',') || '*' }));
 app.use(express.json({ limit: '10mb' }));
 app.use(morgan('dev'));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/api', (req, res) => res.json({ name: 'Reesha API', status: 'ok' }));
 app.use('/api/auth', authRoutes);

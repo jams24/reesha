@@ -1,49 +1,22 @@
-const cloudinary = require('cloudinary').v2;
+const path = require('path');
+const fs = require('fs').promises;
 
-function isConfigured() {
-  return !!(
-    process.env.CLOUDINARY_CLOUD_NAME &&
-    process.env.CLOUDINARY_API_KEY &&
-    process.env.CLOUDINARY_API_SECRET
-  );
-}
+const uploadDir = path.join(__dirname, '../../uploads');
+const uploadUrlPrefix = '/uploads';
 
-if (isConfigured()) {
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-    secure: true,
-  });
-}
-
-function uploadBuffer(buffer, folder = 'reesha/products') {
-  if (!isConfigured()) {
-    const err = new Error('Image uploads are disabled — set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET');
-    err.status = 503;
-    return Promise.reject(err);
-  }
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: 'image' },
-      (err, result) => (err ? reject(err) : resolve(result))
-    );
-    stream.end(buffer);
-  });
+function getUploadUrl(file) {
+  return `${uploadUrlPrefix}/${file.filename}`;
 }
 
 async function destroyByUrl(url) {
-  if (!isConfigured()) return;
   try {
-    const parts = url.split('/');
-    const idx = parts.indexOf('reesha');
-    if (idx === -1) return;
-    const fileWithExt = parts.slice(idx).join('/');
-    const publicId = fileWithExt.replace(/\.[^/.]+$/, '');
-    await cloudinary.uploader.destroy(publicId);
+    if (!url.startsWith(uploadUrlPrefix)) return;
+    const filename = path.basename(url);
+    const filePath = path.join(uploadDir, filename);
+    await fs.unlink(filePath);
   } catch (err) {
-    console.warn('cloudinary destroy failed:', err.message);
+    console.warn('Failed to delete image:', err.message);
   }
 }
 
-module.exports = { cloudinary, uploadBuffer, destroyByUrl, isConfigured };
+module.exports = { uploadBuffer: getUploadUrl, destroyByUrl };
