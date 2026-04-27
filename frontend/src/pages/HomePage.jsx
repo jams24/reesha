@@ -5,11 +5,11 @@ import Hero from '../components/Hero.jsx';
 import CategoryPills, { CATEGORIES } from '../components/CategoryPills.jsx';
 import ProductGrid from '../components/ProductGrid.jsx';
 import InstagramFeed from '../components/InstagramFeed.jsx';
-import { fetchProducts } from '../lib/api.js';
+import { fetchProducts, fetchSettings } from '../lib/api.js';
 
 const CATEGORY_TILES = CATEGORIES.filter((c) => c.slug !== 'all').slice(0, 5);
 
-const TILE_IMAGES = {
+const TILE_DEFAULTS = {
   'baggy-jeans': 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=800&q=80',
   'bum-shorts': 'https://images.unsplash.com/photo-1582418702059-97ebafb35d09?auto=format&fit=crop&w=800&q=80',
   'jorts': 'https://images.unsplash.com/photo-1548883354-94bcfe321cbb?auto=format&fit=crop&w=800&q=80',
@@ -20,19 +20,31 @@ const TILE_IMAGES = {
 export default function HomePage() {
   const [featured, setFeatured] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [tileImages, setTileImages] = useState(TILE_DEFAULTS);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const data = await fetchProducts({ featured: 'true', limit: 8 });
-        let items = data.items || [];
+        const [productData, settings] = await Promise.all([
+          fetchProducts({ featured: 'true', limit: 8 }),
+          fetchSettings().catch(() => ({})),
+        ]);
+        let items = productData.items || [];
         if (items.length < 4) {
           const more = await fetchProducts({ limit: 8 });
           const existing = new Set(items.map((i) => i._id || i.id));
           items = [...items, ...(more.items || []).filter((i) => !existing.has(i._id || i.id))].slice(0, 8);
         }
-        if (!cancelled) setFeatured(items);
+        if (!cancelled) {
+          setFeatured(items);
+          const merged = { ...TILE_DEFAULTS };
+          Object.entries(settings).forEach(([k, v]) => {
+            const slug = k.replace('category_image_', '');
+            if (merged[slug] !== undefined) merged[slug] = v;
+          });
+          setTileImages(merged);
+        }
       } catch (e) {
         console.warn('Could not load products:', e.message);
       } finally {
@@ -68,7 +80,7 @@ export default function HomePage() {
               )}
             >
               <img
-                src={TILE_IMAGES[c.slug]}
+                src={tileImages[c.slug]}
                 alt={c.label}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 loading="lazy"

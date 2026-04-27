@@ -8,6 +8,7 @@ const prisma = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const settingRoutes = require('./routes/settingRoutes');
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.get('/api', (req, res) => res.json({ name: 'Reesha API', status: 'ok' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/settings', settingRoutes);
 
 const frontendDist = path.resolve(__dirname, '../../frontend/dist');
 if (fs.existsSync(frontendDist)) {

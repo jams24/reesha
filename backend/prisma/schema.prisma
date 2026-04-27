@@ -36,6 +36,12 @@ model Product {
   @@index([createdAt])
 }
 
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
 model Order {
   id             String   @id @default(cuid())
   paymentId      String   @unique

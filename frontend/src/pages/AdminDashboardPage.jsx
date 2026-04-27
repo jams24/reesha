@@ -1,9 +1,100 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { fetchProducts, deleteProduct, setProductStock } from '../lib/api.js';
+import { fetchProducts, deleteProduct, setProductStock, fetchSettings, updateCategoryImage } from '../lib/api.js';
 import { formatNaira } from '../lib/whatsapp.js';
 import ProductEditor from '../components/admin/ProductEditor.jsx';
+
+const CATEGORY_SLUGS = [
+  { slug: 'baggy-jeans', label: 'Baggy Jeans' },
+  { slug: 'bum-shorts', label: 'Bum Shorts' },
+  { slug: 'jorts', label: 'Jorts' },
+  { slug: 'maxi-skirts', label: 'Maxi Skirts' },
+  { slug: 'imported', label: 'Imported' },
+];
+
+const TILE_DEFAULTS = {
+  'baggy-jeans': 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=800&q=80',
+  'bum-shorts': 'https://images.unsplash.com/photo-1582418702059-97ebafb35d09?auto=format&fit=crop&w=800&q=80',
+  'jorts': 'https://images.unsplash.com/photo-1548883354-94bcfe321cbb?auto=format&fit=crop&w=800&q=80',
+  'maxi-skirts': 'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?auto=format&fit=crop&w=800&q=80',
+  'imported': 'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?auto=format&fit=crop&w=800&q=80',
+};
+
+function CategoryImageCard({ slug, label, currentUrl, onSaved }) {
+  const [editing, setEditing] = useState(false);
+  const [urlInput, setUrlInput] = useState('');
+  const [saving, setSaving] = useState(false);
+  const fileRef = useRef(null);
+
+  const save = async ({ file, url }) => {
+    if (!file && !url) return;
+    setSaving(true);
+    try {
+      const result = await updateCategoryImage(`category_image_${slug}`, { file, url });
+      onSaved(slug, result.value);
+      setEditing(false);
+      setUrlInput('');
+    } catch (e) {
+      alert('Failed to save image: ' + (e.response?.data?.error || e.message));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="border border-neutral-200 overflow-hidden">
+      <div className="relative aspect-[3/4] bg-neutral-100">
+        <img src={currentUrl} alt={label} className="w-full h-full object-cover" loading="lazy" />
+        <div className="absolute inset-0 bg-ink/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+          <button
+            onClick={() => { setEditing((e) => !e); setUrlInput(''); }}
+            className="bg-paper text-ink px-4 py-2 text-[11px] uppercase tracking-widest2 font-medium hover:bg-neutral-100"
+          >
+            {editing ? 'Cancel' : 'Change image'}
+          </button>
+        </div>
+      </div>
+      <div className="px-3 py-2 border-t border-neutral-100">
+        <p className="text-xs font-medium">{label}</p>
+      </div>
+      {editing && (
+        <div className="border-t border-neutral-200 p-3 space-y-2 bg-neutral-50">
+          <button
+            onClick={() => fileRef.current?.click()}
+            disabled={saving}
+            className="w-full border border-neutral-300 py-2 text-[11px] uppercase tracking-widest2 hover:bg-white disabled:opacity-50"
+          >
+            {saving ? 'Uploading…' : 'Upload photo'}
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) save({ file: f }); e.target.value = ''; }}
+          />
+          <div className="flex gap-2">
+            <input
+              type="url"
+              placeholder="Or paste image URL"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              className="flex-1 border border-neutral-300 px-2 py-1.5 text-xs focus:outline-none focus:border-ink"
+            />
+            <button
+              onClick={() => save({ url: urlInput.trim() })}
+              disabled={saving || !urlInput.trim()}
+              className="px-3 py-1.5 bg-ink text-paper text-[11px] uppercase tracking-widest2 disabled:opacity-40"
+            >
+              Use
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AdminDashboardPage() {
   const { admin, logout } = useAuth();
@@ -13,12 +104,22 @@ export default function AdminDashboardPage() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [categoryImages, setCategoryImages] = useState(TILE_DEFAULTS);
 
   const load = async () => {
     setLoading(true);
     try {
-      const data = await fetchProducts({ limit: 100 });
+      const [data, settings] = await Promise.all([
+        fetchProducts({ limit: 100 }),
+        fetchSettings().catch(() => ({})),
+      ]);
       setProducts(data.items || []);
+      const merged = { ...TILE_DEFAULTS };
+      Object.entries(settings).forEach(([k, v]) => {
+        const slug = k.replace('category_image_', '');
+        if (merged[slug] !== undefined) merged[slug] = v;
+      });
+      setCategoryImages(merged);
     } finally {
       setLoading(false);
     }
@@ -50,6 +151,10 @@ export default function AdminDashboardPage() {
     const inStock = p.stock === 0;
     const updated = await setProductStock(id, inStock);
     setProducts((arr) => arr.map((x) => ((x._id || x.id) === id ? updated : x)));
+  };
+
+  const onCategoryImageSaved = (slug, value) => {
+    setCategoryImages((prev) => ({ ...prev, [slug]: value }));
   };
 
   const onSaved = (saved, wasEditing) => {
@@ -249,6 +354,27 @@ export default function AdminDashboardPage() {
             </div>
           </>
         )}
+      </div>
+
+      <div className="container-x pb-16 sm:pb-20">
+        <div className="border-t border-neutral-200 pt-10 mt-10">
+          <p className="eyebrow">Storefront</p>
+          <h2 className="section-title mt-1">Category cover images</h2>
+          <p className="text-xs sm:text-sm text-neutral-500 mt-1 mb-6">
+            Hover a tile and click "Change image" to upload a photo or paste a URL.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+            {CATEGORY_SLUGS.map((c) => (
+              <CategoryImageCard
+                key={c.slug}
+                slug={c.slug}
+                label={c.label}
+                currentUrl={categoryImages[c.slug]}
+                onSaved={onCategoryImageSaved}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       <ProductEditor

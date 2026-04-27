@@ -69,3 +69,18 @@ export async function approveOrder(paymentId) {
   const { data } = await api.patch(`/payments/${paymentId}/approve`);
   return data;
 }
+
+export async function fetchSettings() {
+  const { data } = await api.get('/settings');
+  return data;
+}
+
+export async function updateCategoryImage(key, { file, url }) {
+  const form = new FormData();
+  if (file) form.append('file', file);
+  else if (url) form.append('value', url);
+  const { data } = await api.patch(`/settings/${key}`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data;
+}
