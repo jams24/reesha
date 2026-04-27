@@ -83,7 +83,8 @@ exports.create = async (req, res) => {
 
   const imageUrls = parseJSONArray(req.body.imageUrls);
   if (req.files?.length) {
-    imageUrls.push(...req.files.map((f) => uploadBuffer(f)));
+    const uploads = await Promise.all(req.files.map((f) => uploadBuffer(f.buffer)));
+    imageUrls.push(...uploads.map((u) => u.secure_url));
   }
 
   const slug = await buildUniqueSlug(name);
@@ -140,7 +141,8 @@ exports.update = async (req, res) => {
   }
 
   if (req.files?.length) {
-    images = [...images, ...req.files.map((f) => uploadBuffer(f))];
+    const uploads = await Promise.all(req.files.map((f) => uploadBuffer(f.buffer)));
+    images = [...images, ...uploads.map((u) => u.secure_url)];
   }
   data.images = images;
 
