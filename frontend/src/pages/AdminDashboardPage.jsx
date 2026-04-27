@@ -157,7 +157,9 @@ export default function AdminDashboardPage() {
                       </p>
                       <div className="flex items-center justify-between mt-1.5">
                         <p className="text-sm font-medium">{formatNaira(p.price)}</p>
-                        <p className="text-[11px] text-neutral-500">Stock {p.stock}</p>
+                        <span className={`text-[10px] uppercase tracking-widest2 px-2 py-0.5 border ${p.stock === 0 ? 'border-red-200 bg-red-50 text-red-600' : 'border-green-200 bg-green-50 text-green-700'}`}>
+                          {p.stock === 0 ? 'Sold out' : 'In stock'}
+                        </span>
                       </div>
                       <div className="mt-auto pt-2 flex items-center gap-1 -ml-2">
                         <Link
@@ -175,9 +177,9 @@ export default function AdminDashboardPage() {
                         </button>
                         <button
                           onClick={() => onToggleStock(p)}
-                          className={`px-2 py-1.5 text-[11px] uppercase tracking-widest2 ${p.stock === 0 ? 'text-green-700 hover:text-green-900' : 'text-neutral-400 hover:text-neutral-600'}`}
+                          className={`px-2 py-1.5 text-[11px] uppercase tracking-widest2 ${p.stock === 0 ? 'text-green-700 hover:text-green-900' : 'text-orange-600 hover:text-orange-800'}`}
                         >
-                          {p.stock === 0 ? 'Mark in stock' : 'Mark sold'}
+                          {p.stock === 0 ? '→ Mark in stock' : '→ Mark sold out'}
                         </button>
                         <button
                           onClick={() => onDelete(p)}
@@ -233,9 +235,9 @@ export default function AdminDashboardPage() {
                           <button onClick={() => onEdit(p)} className="text-[11px] uppercase tracking-widest2 hover:text-neutral-500 mr-4">Edit</button>
                           <button
                             onClick={() => onToggleStock(p)}
-                            className={`text-[11px] uppercase tracking-widest2 mr-4 ${p.stock === 0 ? 'text-green-700 hover:text-green-900' : 'text-neutral-400 hover:text-neutral-600'}`}
+                            className={`text-[11px] uppercase tracking-widest2 mr-4 ${p.stock === 0 ? 'text-green-700 hover:text-green-900' : 'text-orange-600 hover:text-orange-800'}`}
                           >
-                            {p.stock === 0 ? 'In stock' : 'Sold out'}
+                            {p.stock === 0 ? '→ Mark in stock' : '→ Mark sold out'}
                           </button>
                           <button onClick={() => onDelete(p)} className="text-[11px] uppercase tracking-widest2 text-red-600 hover:text-red-800">Delete</button>
                         </td>
