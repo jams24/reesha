@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { fetchProducts, deleteProduct } from '../lib/api.js';
+import { fetchProducts, deleteProduct, setProductStock } from '../lib/api.js';
 import { formatNaira } from '../lib/whatsapp.js';
 import ProductEditor from '../components/admin/ProductEditor.jsx';
 
@@ -43,6 +43,13 @@ export default function AdminDashboardPage() {
     const id = p._id || p.id;
     await deleteProduct(id);
     setProducts((arr) => arr.filter((x) => (x._id || x.id) !== id));
+  };
+
+  const onToggleStock = async (p) => {
+    const id = p._id || p.id;
+    const inStock = p.stock === 0;
+    const updated = await setProductStock(id, inStock);
+    setProducts((arr) => arr.map((x) => ((x._id || x.id) === id ? updated : x)));
   };
 
   const onSaved = (saved, wasEditing) => {
@@ -167,6 +174,12 @@ export default function AdminDashboardPage() {
                           Edit
                         </button>
                         <button
+                          onClick={() => onToggleStock(p)}
+                          className={`px-2 py-1.5 text-[11px] uppercase tracking-widest2 ${p.stock === 0 ? 'text-green-700 hover:text-green-900' : 'text-neutral-400 hover:text-neutral-600'}`}
+                        >
+                          {p.stock === 0 ? 'Mark in stock' : 'Mark sold'}
+                        </button>
+                        <button
                           onClick={() => onDelete(p)}
                           className="px-2 py-1.5 text-[11px] uppercase tracking-widest2 text-red-600 hover:text-red-800 ml-auto"
                         >
@@ -209,11 +222,21 @@ export default function AdminDashboardPage() {
                         </td>
                         <td className="py-2 px-4 text-neutral-600">{p.category?.replace('-', ' ')}</td>
                         <td className="py-2 px-4">{formatNaira(p.price)}</td>
-                        <td className="py-2 px-4">{p.stock}</td>
+                        <td className="py-2 px-4">
+                          <span className={`text-[10px] uppercase tracking-widest2 px-2 py-0.5 border ${p.stock === 0 ? 'border-red-200 bg-red-50 text-red-600' : 'border-green-200 bg-green-50 text-green-700'}`}>
+                            {p.stock === 0 ? 'Sold out' : 'In stock'}
+                          </span>
+                        </td>
                         <td className="py-2 px-4">{p.featured ? '★' : '—'}</td>
                         <td className="py-2 px-4 text-right whitespace-nowrap">
                           <Link to={`/product/${p.slug}`} target="_blank" className="text-[11px] uppercase tracking-widest2 text-neutral-500 hover:text-ink mr-4">View</Link>
                           <button onClick={() => onEdit(p)} className="text-[11px] uppercase tracking-widest2 hover:text-neutral-500 mr-4">Edit</button>
+                          <button
+                            onClick={() => onToggleStock(p)}
+                            className={`text-[11px] uppercase tracking-widest2 mr-4 ${p.stock === 0 ? 'text-green-700 hover:text-green-900' : 'text-neutral-400 hover:text-neutral-600'}`}
+                          >
+                            {p.stock === 0 ? 'In stock' : 'Sold out'}
+                          </button>
                           <button onClick={() => onDelete(p)} className="text-[11px] uppercase tracking-widest2 text-red-600 hover:text-red-800">Delete</button>
                         </td>
                       </tr>

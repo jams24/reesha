@@ -40,6 +40,11 @@ export async function deleteProduct(id) {
   return data;
 }
 
+export async function setProductStock(id, inStock) {
+  const { data } = await api.patch(`/products/${id}/stock`, { inStock });
+  return data;
+}
+
 export async function loginAdmin(email, password) {
   const { data } = await api.post('/auth/login', { email, password });
   return data;
