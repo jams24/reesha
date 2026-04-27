@@ -2,6 +2,8 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
+import CartDrawer from './components/CartDrawer.jsx';
+import { CartProvider } from './context/CartContext.jsx';
 import HomePage from './pages/HomePage.jsx';
 import ShopPage from './pages/ShopPage.jsx';
 import ProductDetailPage from './pages/ProductDetailPage.jsx';
@@ -24,9 +26,11 @@ export default function App() {
   const isAdmin = pathname.startsWith('/admin');
 
   return (
+    <CartProvider>
     <div className="min-h-screen flex flex-col">
       <ScrollToTop />
       {!isAdmin && <Navbar />}
+      {!isAdmin && <CartDrawer />}
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -43,5 +47,6 @@ export default function App() {
       </main>
       {!isAdmin && <Footer />}
     </div>
+    </CartProvider>
   );
 }

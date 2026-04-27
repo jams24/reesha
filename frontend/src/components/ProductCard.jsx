@@ -2,9 +2,12 @@ import { Link } from 'react-router-dom';
 import WishlistHeart from './WishlistHeart.jsx';
 import { formatNaira } from '../lib/whatsapp.js';
 
+const TWO_WEEKS_MS = 14 * 24 * 60 * 60 * 1000;
+
 export default function ProductCard({ product }) {
   const image = product.images?.[0];
   const soldOut = product.stock === 0;
+  const isNew = product.createdAt && (Date.now() - new Date(product.createdAt).getTime()) < TWO_WEEKS_MS;
   return (
     <Link to={`/product/${product.slug}`} className="group block">
       <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden">
@@ -21,6 +24,11 @@ export default function ProductCard({ product }) {
           </div>
         )}
         <WishlistHeart product={product} className="absolute top-2 right-2 sm:top-3 sm:right-3" />
+        {isNew && !soldOut && (
+          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-ink text-paper text-[9px] uppercase tracking-widest2 px-2 py-1">
+            New
+          </div>
+        )}
         {soldOut && (
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="bg-paper text-ink text-[9px] sm:text-[10px] uppercase tracking-widest2 px-3 py-1.5 border border-neutral-300">

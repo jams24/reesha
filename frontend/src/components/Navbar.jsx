@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
 import { getWishlist, onWishlistChange } from '../lib/wishlist.js';
+import { useCart } from '../context/CartContext.jsx';
 
 const links = [
   { to: '/', label: 'Home', end: true },
@@ -22,6 +23,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState(() => getWishlist().length);
   const { pathname } = useLocation();
+  const { count: cartCount, setDrawerOpen } = useCart();
 
   useEffect(() => onWishlistChange(() => setCount(getWishlist().length)), []);
   useEffect(() => { setOpen(false); }, [pathname]);
@@ -80,6 +82,22 @@ export default function Navbar() {
               <span className="absolute top-0 right-0 bg-ink text-paper text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1">{count}</span>
             )}
           </Link>
+
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="relative inline-flex items-center gap-2 p-2 text-[11px] uppercase tracking-widest2 font-medium hover:text-neutral-500 min-w-[44px] min-h-[44px] justify-center"
+            aria-label="Cart"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            <span className="hidden md:inline">Cart</span>
+            {cartCount > 0 && (
+              <span className="absolute top-0 right-0 bg-ink text-paper text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1">{cartCount}</span>
+            )}
+          </button>
           <button
             className="md:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
             onClick={() => setOpen(true)}

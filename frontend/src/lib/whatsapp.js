@@ -26,3 +26,19 @@ export function buildWhatsAppOrderUrl(product, { size } = {}) {
 export function buildGeneralWhatsAppUrl(message = "Hi Reesha! I'd like to ask about your wears.") {
   return `https://wa.me/${NUMBER}?text=${encodeURIComponent(message)}`;
 }
+
+export function buildWhatsAppCartUrl(items) {
+  const lines = [
+    `Hi Reesha! I'd like to order the following:`,
+    ``,
+    ...items.map((item, i) => {
+      const size = item.size ? ` (Size: ${item.size})` : '';
+      return `${i + 1}. *${item.name}*${size} — ${formatNaira(item.price)}`;
+    }),
+    ``,
+    `*Total: ${formatNaira(items.reduce((s, i) => s + i.price, 0))}*`,
+    ``,
+    `Please confirm availability and arrange delivery. Thank you!`,
+  ];
+  return `https://wa.me/${NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`;
+}
