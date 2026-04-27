@@ -9,6 +9,7 @@ import AboutPage from './pages/AboutPage.jsx';
 import WishlistPage from './pages/WishlistPage.jsx';
 import AdminLoginPage from './pages/AdminLoginPage.jsx';
 import AdminDashboardPage from './pages/AdminDashboardPage.jsx';
+import AdminOrdersPage from './pages/AdminOrdersPage.jsx';
 import PaymentStatusPage from './pages/PaymentStatusPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/pay/:paymentId" element={<PaymentStatusPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<ProtectedRoute><AdminDashboardPage /></ProtectedRoute>} />
+          <Route path="/admin/orders" element={<ProtectedRoute><AdminOrdersPage /></ProtectedRoute>} />
           <Route path="*" element={<HomePage />} />
         </Routes>
       </main>

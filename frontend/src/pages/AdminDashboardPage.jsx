@@ -67,6 +67,7 @@ export default function AdminDashboardPage() {
           {/* Desktop actions */}
           <div className="hidden sm:flex items-center gap-4 text-sm">
             <span className="text-neutral-500 text-xs truncate max-w-[200px]">{admin?.email}</span>
+            <Link to="/admin/orders" className="text-[11px] uppercase tracking-widest2 text-neutral-500 hover:text-ink">Orders</Link>
             <Link to="/" className="text-[11px] uppercase tracking-widest2 text-neutral-500 hover:text-ink">View store</Link>
             <button onClick={logout} className="text-[11px] uppercase tracking-widest2 hover:text-neutral-500">Sign out</button>
           </div>
@@ -86,6 +87,7 @@ export default function AdminDashboardPage() {
           <div className="sm:hidden border-t border-neutral-200 bg-paper">
             <div className="container-x py-4 space-y-2">
               <p className="text-xs text-neutral-500 truncate">{admin?.email}</p>
+              <Link to="/admin/orders" onClick={() => setMenuOpen(false)} className="block py-2 text-sm uppercase tracking-widest2 text-neutral-500">Orders</Link>
               <Link to="/" onClick={() => setMenuOpen(false)} className="block py-2 text-sm uppercase tracking-widest2 text-neutral-500">View store</Link>
               <button onClick={logout} className="block py-2 text-sm uppercase tracking-widest2 text-left w-full">Sign out</button>
             </div>

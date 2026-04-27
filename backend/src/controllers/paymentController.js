@@ -128,3 +128,35 @@ exports.getPaymentStatus = async (req, res) => {
     createdAt: order.createdAt,
   });
 };
+
+exports.listOrders = async (req, res) => {
+  const { status, page = 1 } = req.query;
+  const where = status ? { status } : {};
+  const lim = 50;
+  const skip = (Math.max(Number(page), 1) - 1) * lim;
+
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take: lim }),
+    prisma.order.count({ where }),
+  ]);
+
+  const enriched = orders.map((o) => ({
+    ...o,
+    whatsappUrl: o.status === 'CONFIRMED' ? buildCryptoWhatsAppUrl(o) : null,
+  }));
+
+  res.json({ orders: enriched, total, page: Number(page) });
+};
+
+exports.approveOrder = async (req, res) => {
+  const order = await prisma.order.findUnique({ where: { paymentId: req.params.paymentId } });
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+  if (order.status === 'CONFIRMED') return res.json({ ok: true, message: 'Already confirmed' });
+
+  const updated = await prisma.order.update({
+    where: { paymentId: req.params.paymentId },
+    data: { status: 'CONFIRMED' },
+  });
+
+  res.json({ ok: true, whatsappUrl: buildCryptoWhatsAppUrl(updated) });
+};

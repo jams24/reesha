@@ -54,3 +54,13 @@ export async function fetchPaymentStatus(paymentId) {
   const { data } = await api.get(`/payments/${paymentId}/status`);
   return data;
 }
+
+export async function fetchOrders(params = {}) {
+  const { data } = await api.get('/payments/orders', { params });
+  return data;
+}
+
+export async function approveOrder(paymentId) {
+  const { data } = await api.patch(`/payments/${paymentId}/approve`);
+  return data;
+}
