@@ -47,7 +47,7 @@ export default function Footer() {
               </a>
             </li>
             <li><a href="tel:+2348161518807" className="hover:text-neutral-500">+234 816 151 8807</a></li>
-            <li><a href="mailto:Akinolamojisola31@gmail.com" className="hover:text-neutral-500 break-all">Akinolamojisola31@gmail.com</a></li>
+            <li><a href="mailto:support@reeshawears.store" className="hover:text-neutral-500 break-all">support@reeshawears.store</a></li>
             <li className="text-neutral-500">Osogbo, Osun State<br/>Nationwide delivery</li>
           </ul>
         </div>

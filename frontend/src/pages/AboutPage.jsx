@@ -68,7 +68,7 @@ export default function AboutPage() {
             <div className="border-t border-neutral-700 pt-4 sm:pt-6">
               <dt className="text-[10px] sm:text-[11px] uppercase tracking-widest2 text-neutral-400">Email</dt>
               <dd className="mt-2 text-base sm:text-lg break-all">
-                <a href="mailto:Akinolamojisola31@gmail.com" className="hover:text-neutral-300">Akinolamojisola31@gmail.com</a>
+                <a href="mailto:support@reeshawears.store" className="hover:text-neutral-300">support@reeshawears.store</a>
               </dd>
             </div>
             <div className="border-t border-neutral-700 pt-4 sm:pt-6">
