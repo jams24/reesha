@@ -3,6 +3,29 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { fetchOrders, approveOrder } from '../lib/api.js';
 
+function CopyId({ id }) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard.writeText(id).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+  return (
+    <button
+      onClick={copy}
+      title="Copy transaction ID"
+      className="group inline-flex items-center gap-1.5 text-[10px] font-mono text-neutral-400 hover:text-ink transition-colors"
+    >
+      <span className="truncate max-w-[140px]">{id}</span>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+        {copied ? <path d="M5 12l4 4L19 7"/> : <><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></>}
+      </svg>
+      {copied && <span className="text-green-600 text-[9px]">Copied!</span>}
+    </button>
+  );
+}
+
 const STATUS_FILTERS = [
   { value: '', label: 'All' },
   { value: 'PENDING', label: 'Pending' },
@@ -160,7 +183,10 @@ export default function AdminOrdersPage() {
                     <p><span className="text-neutral-400">Customer:</span> {o.customerName}{o.customerPhone ? ` · ${o.customerPhone}` : ''}</p>
                     <p><span className="text-neutral-400">Amount:</span> ${o.cryptoPriceUsd} · {NETWORK_LABELS[o.currency] || o.currency}</p>
                     <p><span className="text-neutral-400">Date:</span> {new Date(o.createdAt).toLocaleString()}</p>
-                    <p className="text-[10px] text-neutral-400 break-all">ID: {o.paymentId}</p>
+                  </div>
+                  <div className="flex items-center gap-2 pt-1">
+                    <span className="text-[10px] uppercase tracking-widest2 text-neutral-400">Txn ID:</span>
+                    <CopyId id={o.paymentId} />
                   </div>
                   <div className="flex flex-wrap gap-2 pt-1">
                     <a
@@ -205,6 +231,7 @@ export default function AdminOrdersPage() {
                     <th className="py-3 px-4 text-[11px] uppercase tracking-widest2 font-normal">Amount</th>
                     <th className="py-3 px-4 text-[11px] uppercase tracking-widest2 font-normal">Network</th>
                     <th className="py-3 px-4 text-[11px] uppercase tracking-widest2 font-normal">Status</th>
+                    <th className="py-3 px-4 text-[11px] uppercase tracking-widest2 font-normal">Transaction ID</th>
                     <th className="py-3 px-4 text-[11px] uppercase tracking-widest2 font-normal">Date</th>
                     <th className="py-3 px-4"></th>
                   </tr>
@@ -225,6 +252,7 @@ export default function AdminOrdersPage() {
                       <td className="py-3 px-4 font-medium">${o.cryptoPriceUsd}</td>
                       <td className="py-3 px-4 text-xs text-neutral-600">{NETWORK_LABELS[o.currency] || o.currency}</td>
                       <td className="py-3 px-4"><StatusBadge status={o.status} /></td>
+                      <td className="py-3 px-4"><CopyId id={o.paymentId} /></td>
                       <td className="py-3 px-4 text-xs text-neutral-500 whitespace-nowrap">
                         {new Date(o.createdAt).toLocaleString()}
                       </td>
