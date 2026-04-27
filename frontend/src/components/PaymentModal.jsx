@@ -4,8 +4,10 @@ import clsx from 'clsx';
 import { createCryptoPayment } from '../lib/api.js';
 
 const NETWORKS = [
-  { value: 'USDT_ERC20', label: 'USDT — Ethereum (ERC-20)', time: '~3 min' },
   { value: 'USDT_BEP20', label: 'USDT — BNB Smart Chain (BEP-20)', time: '~45 sec' },
+  { value: 'USDT_ERC20', label: 'USDT — Ethereum (ERC-20)', time: '~3 min' },
+  { value: 'USDC_BEP20', label: 'USDC — BNB Smart Chain (BEP-20)', time: '~45 sec' },
+  { value: 'USDC_SOL',   label: 'USDC — Solana', time: '~12 sec' },
 ];
 
 export default function PaymentModal({ open, product, selectedSize, onClose }) {

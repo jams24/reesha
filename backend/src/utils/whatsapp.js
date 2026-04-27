@@ -3,6 +3,8 @@ const NUMBER = process.env.WHATSAPP_NUMBER || '2348161518807';
 const NETWORK_LABELS = {
   USDT_ERC20: 'USDT (Ethereum / ERC-20)',
   USDT_BEP20: 'USDT (BNB Smart Chain / BEP-20)',
+  USDC_BEP20: 'USDC (BNB Smart Chain / BEP-20)',
+  USDC_SOL:   'USDC (Solana)',
 };
 
 exports.buildCryptoWhatsAppUrl = (order) => {

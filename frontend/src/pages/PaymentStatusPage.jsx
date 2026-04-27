@@ -5,6 +5,8 @@ import { fetchPaymentStatus } from '../lib/api.js';
 const NETWORK_LABELS = {
   USDT_ERC20: 'USDT (ERC-20 · Ethereum)',
   USDT_BEP20: 'USDT (BEP-20 · BNB Chain)',
+  USDC_BEP20: 'USDC (BEP-20 · BNB Chain)',
+  USDC_SOL:   'USDC (Solana)',
 };
 
 const POLL_INTERVAL = 5000;

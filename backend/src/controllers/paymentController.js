@@ -6,7 +6,7 @@ const INVENTPAY_API_KEY = process.env.INVENTPAY_API_KEY;
 const INVENTPAY_WEBHOOK_SECRET = process.env.INVENTPAY_WEBHOOK_SECRET;
 const INVENTPAY_BASE = 'https://api.inventpay.io/v1';
 
-const ALLOWED_CURRENCIES = ['USDT_ERC20', 'USDT_BEP20'];
+const ALLOWED_CURRENCIES = ['USDT_ERC20', 'USDT_BEP20', 'USDC_BEP20', 'USDC_SOL'];
 
 async function inventpayPost(path, body) {
   const res = await fetch(`${INVENTPAY_BASE}${path}`, {
