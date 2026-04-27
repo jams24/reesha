@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const prisma = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.get('/api', (req, res) => res.json({ name: 'Reesha API', status: 'ok' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/payments', paymentRoutes);
 
 const frontendDist = path.resolve(__dirname, '../../frontend/dist');
 if (fs.existsSync(frontendDist)) {

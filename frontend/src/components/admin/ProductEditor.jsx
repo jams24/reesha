@@ -16,6 +16,7 @@ function emptyForm() {
     name: '',
     description: '',
     price: '',
+    cryptoPriceUsd: '',
     category: 'baggy-jeans',
     sizes: '',
     stock: 1,
@@ -40,6 +41,7 @@ export default function ProductEditor({ open, product, onClose, onSaved }) {
         name: product.name || '',
         description: product.description || '',
         price: product.price ?? '',
+        cryptoPriceUsd: product.cryptoPriceUsd ?? '',
         category: product.category || 'other',
         sizes: (product.sizes || []).join(', '),
         stock: product.stock ?? 1,
@@ -116,6 +118,7 @@ export default function ProductEditor({ open, product, onClose, onSaved }) {
       data.append('name', form.name);
       data.append('description', form.description);
       data.append('price', String(form.price));
+      data.append('cryptoPriceUsd', String(form.cryptoPriceUsd ?? ''));
       data.append('category', form.category);
       data.append('stock', String(form.stock || 0));
       data.append('featured', form.featured ? 'true' : 'false');
@@ -177,6 +180,25 @@ export default function ProductEditor({ open, product, onClose, onSaved }) {
                 <label className="eyebrow block mb-2">Price (₦)</label>
                 <input className="input" type="number" inputMode="numeric" min="0" step="50" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required />
                 {form.price !== '' && <p className="text-[11px] text-neutral-500 mt-1">{formatNaira(form.price)}</p>}
+              </div>
+
+              <div>
+                <label className="eyebrow block mb-2">
+                  Crypto price ($) <span className="normal-case text-neutral-400 text-[10px]">optional</span>
+                </label>
+                <input
+                  className="input"
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  step="0.01"
+                  placeholder="e.g. 25.00"
+                  value={form.cryptoPriceUsd}
+                  onChange={(e) => setForm({ ...form, cryptoPriceUsd: e.target.value })}
+                />
+                <p className="text-[11px] text-neutral-500 mt-1">
+                  {form.cryptoPriceUsd ? `Customer pays $${form.cryptoPriceUsd} USDT` : 'Leave empty to disable crypto payments for this product'}
+                </p>
               </div>
 
               <div>

@@ -6,6 +6,7 @@ import { buildWhatsAppOrderUrl, formatNaira } from '../lib/whatsapp.js';
 import WishlistHeart from '../components/WishlistHeart.jsx';
 import SizeGuideModal from '../components/SizeGuideModal.jsx';
 import LoadingSkeleton from '../components/LoadingSkeleton.jsx';
+import PaymentModal from '../components/PaymentModal.jsx';
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -16,6 +17,7 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState('');
   const [guideOpen, setGuideOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [cryptoModalOpen, setCryptoModalOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -56,6 +58,7 @@ export default function ProductDetailPage() {
 
   const hasSizes = product.sizes?.length > 0;
   const outOfStock = product.stock === 0;
+  const hasCrypto = product.cryptoPriceUsd > 0;
 
   const onOrder = () => {
     if (hasSizes && !selectedSize) {
@@ -64,6 +67,14 @@ export default function ProductDetailPage() {
     }
     const url = buildWhatsAppOrderUrl(product, { size: selectedSize });
     window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const onCryptoOrder = () => {
+    if (hasSizes && !selectedSize) {
+      alert('Please select a size first.');
+      return;
+    }
+    setCryptoModalOpen(true);
   };
 
   const onCopyLink = async () => {
@@ -154,25 +165,39 @@ export default function ProductDetailPage() {
           )}
 
           {/* Desktop order buttons */}
-          <div className="mt-8 sm:mt-10 hidden md:flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={onOrder}
-              disabled={outOfStock}
-              className={clsx(
-                'flex-1 inline-flex items-center justify-center gap-2 px-8 py-4 text-xs uppercase tracking-widest2 font-medium transition-colors min-h-[52px]',
-                outOfStock
-                  ? 'bg-neutral-200 text-neutral-500 cursor-not-allowed'
-                  : 'bg-ink text-paper hover:bg-neutral-700'
-              )}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.46 1.32 4.97L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.92 0-2.65-1.03-5.14-2.9-7.01A9.88 9.88 0 0 0 12.04 2z"/>
-              </svg>
-              {outOfStock ? 'Sold' : 'Order on WhatsApp'}
-            </button>
-            <button onClick={onCopyLink} className="btn-outline">
-              {copied ? 'Copied!' : 'Copy link'}
-            </button>
+          <div className="mt-8 sm:mt-10 hidden md:flex flex-col gap-2">
+            <div className="flex gap-3">
+              <button
+                onClick={onOrder}
+                disabled={outOfStock}
+                className={clsx(
+                  'flex-1 inline-flex items-center justify-center gap-2 px-8 py-4 text-xs uppercase tracking-widest2 font-medium transition-colors min-h-[52px]',
+                  outOfStock
+                    ? 'bg-neutral-200 text-neutral-500 cursor-not-allowed'
+                    : 'bg-ink text-paper hover:bg-neutral-700'
+                )}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.46 1.32 4.97L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.92 0-2.65-1.03-5.14-2.9-7.01A9.88 9.88 0 0 0 12.04 2z"/>
+                </svg>
+                {outOfStock ? 'Sold' : 'Order on WhatsApp (₦)'}
+              </button>
+              <button onClick={onCopyLink} className="btn-outline">
+                {copied ? 'Copied!' : 'Copy link'}
+              </button>
+            </div>
+            {hasCrypto && !outOfStock && (
+              <button
+                onClick={onCryptoOrder}
+                className="w-full inline-flex items-center justify-center gap-2 px-8 py-3.5 text-xs uppercase tracking-widest2 font-medium border border-neutral-300 hover:border-ink transition-colors min-h-[48px]"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 4-5 4-5 7h5M12 18.5v.5"/>
+                </svg>
+                Pay with USDT (${product.cryptoPriceUsd})
+              </button>
+            )}
           </div>
 
           <ul className="mt-8 sm:mt-10 space-y-2 text-xs sm:text-sm text-neutral-600">
@@ -180,7 +205,7 @@ export default function ProductDetailPage() {
               <span className="w-1 h-1 bg-ink rounded-full" /> Nationwide delivery from Osogbo
             </li>
             <li className="flex items-center gap-2">
-              <span className="w-1 h-1 bg-ink rounded-full" /> Payment via bank transfer on WhatsApp
+              <span className="w-1 h-1 bg-ink rounded-full" /> Pay in Naira via WhatsApp or USDT crypto
             </li>
             <li className="flex items-center gap-2">
               <span className="w-1 h-1 bg-ink rounded-full" /> Most items are one-of-one — first come, first served
@@ -195,7 +220,7 @@ export default function ProductDetailPage() {
           <button
             onClick={onCopyLink}
             aria-label="Copy link"
-            className="w-12 h-12 border border-neutral-300 flex items-center justify-center hover:border-ink"
+            className="w-12 h-12 border border-neutral-300 flex items-center justify-center hover:border-ink flex-shrink-0"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               {copied ? (
@@ -221,12 +246,30 @@ export default function ProductDetailPage() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.46 1.32 4.97L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.92 0-2.65-1.03-5.14-2.9-7.01A9.88 9.88 0 0 0 12.04 2z"/>
             </svg>
-            {outOfStock ? 'Sold' : `Order · ${formatNaira(product.price)}`}
+            {outOfStock ? 'Sold' : formatNaira(product.price)}
           </button>
+          {hasCrypto && !outOfStock && (
+            <button
+              onClick={onCryptoOrder}
+              className="flex-1 inline-flex items-center justify-center gap-1.5 text-xs uppercase tracking-widest2 font-medium border border-neutral-300 hover:border-ink transition-colors"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 4-5 4-5 7h5M12 18.5v.5"/>
+              </svg>
+              ${product.cryptoPriceUsd} USDT
+            </button>
+          )}
         </div>
       </div>
 
       <SizeGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} />
+      <PaymentModal
+        open={cryptoModalOpen}
+        product={product}
+        selectedSize={selectedSize}
+        onClose={() => setCryptoModalOpen(false)}
+      />
     </div>
   );
 }

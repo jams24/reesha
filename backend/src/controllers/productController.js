@@ -88,12 +88,17 @@ exports.create = async (req, res) => {
 
   const slug = await buildUniqueSlug(name);
 
+  const cryptoPriceUsd = req.body.cryptoPriceUsd !== undefined && req.body.cryptoPriceUsd !== ''
+    ? Number(req.body.cryptoPriceUsd)
+    : null;
+
   const product = await prisma.product.create({
     data: {
       name,
       slug,
       description,
       price: Number(price),
+      cryptoPriceUsd,
       category,
       sizes,
       stock: Number(stock),
@@ -116,6 +121,11 @@ exports.update = async (req, res) => {
   }
   if (req.body.description !== undefined) data.description = req.body.description;
   if (req.body.price !== undefined) data.price = Number(req.body.price);
+  if (req.body.cryptoPriceUsd !== undefined) {
+    data.cryptoPriceUsd = req.body.cryptoPriceUsd === '' || req.body.cryptoPriceUsd === null
+      ? null
+      : Number(req.body.cryptoPriceUsd);
+  }
   if (req.body.category !== undefined) data.category = normalizeCategory(req.body.category);
   if (req.body.stock !== undefined) data.stock = Number(req.body.stock);
   if (req.body.featured !== undefined) data.featured = coerceBool(req.body.featured);

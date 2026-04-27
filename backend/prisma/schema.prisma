@@ -17,20 +17,41 @@ model Admin {
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String   @default("")
-  price       Int
-  category    String   @default("other")
-  sizes       String[]
-  images      String[]
-  stock       Int      @default(1)
-  featured    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  description    String   @default("")
+  price          Int
+  cryptoPriceUsd Float?
+  category       String   @default("other")
+  sizes          String[]
+  images         String[]
+  stock          Int      @default(1)
+  featured       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@index([category])
   @@index([featured])
   @@index([createdAt])
+}
+
+model Order {
+  id             String   @id @default(cuid())
+  paymentId      String   @unique
+  productId      String
+  productName    String
+  productSlug    String
+  cryptoPriceUsd Float
+  currency       String
+  size           String?
+  customerName   String
+  customerPhone  String?
+  status         String   @default("PENDING")
+  invoiceUrl     String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([paymentId])
+  @@index([status])
 }

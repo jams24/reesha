@@ -9,6 +9,7 @@ import AboutPage from './pages/AboutPage.jsx';
 import WishlistPage from './pages/WishlistPage.jsx';
 import AdminLoginPage from './pages/AdminLoginPage.jsx';
 import AdminDashboardPage from './pages/AdminDashboardPage.jsx';
+import PaymentStatusPage from './pages/PaymentStatusPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 function ScrollToTop() {
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/product/:slug" element={<ProductDetailPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/wishlist" element={<WishlistPage />} />
+          <Route path="/pay/:paymentId" element={<PaymentStatusPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<ProtectedRoute><AdminDashboardPage /></ProtectedRoute>} />
           <Route path="*" element={<HomePage />} />
