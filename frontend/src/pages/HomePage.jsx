@@ -21,6 +21,8 @@ export default function HomePage() {
   const [featured, setFeatured] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tileImages, setTileImages] = useState(TILE_DEFAULTS);
+  const [igHandle, setIgHandle] = useState('');
+  const [igImages, setIgImages] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -39,11 +41,20 @@ export default function HomePage() {
         if (!cancelled) {
           setFeatured(items);
           const merged = { ...TILE_DEFAULTS };
+          const igImgs = [];
           Object.entries(settings).forEach(([k, v]) => {
-            const slug = k.replace('category_image_', '');
-            if (merged[slug] !== undefined) merged[slug] = v;
+            if (k.startsWith('category_image_')) {
+              const slug = k.replace('category_image_', '');
+              if (merged[slug] !== undefined) merged[slug] = v;
+            } else if (k === 'instagram_handle') {
+              setIgHandle(v);
+            } else if (k.startsWith('instagram_image_')) {
+              const idx = Number(k.replace('instagram_image_', ''));
+              igImgs[idx] = v;
+            }
           });
           setTileImages(merged);
+          if (igImgs.some(Boolean)) setIgImages(igImgs);
         }
       } catch (e) {
         console.warn('Could not load products:', e.message);
@@ -129,7 +140,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <InstagramFeed />
+      <InstagramFeed handle={igHandle || undefined} images={igImages.length ? igImages : undefined} />
     </div>
   );
 }

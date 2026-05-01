@@ -7,6 +7,13 @@ const ALLOWED_KEYS = [
   'category_image_jorts',
   'category_image_maxi-skirts',
   'category_image_imported',
+  'instagram_handle',
+  'instagram_image_0',
+  'instagram_image_1',
+  'instagram_image_2',
+  'instagram_image_3',
+  'instagram_image_4',
+  'instagram_image_5',
 ];
 
 exports.list = async (req, res) => {

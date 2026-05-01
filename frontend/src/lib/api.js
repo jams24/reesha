@@ -75,6 +75,15 @@ export async function fetchSettings() {
   return data;
 }
 
+export async function updateSetting(key, textValue) {
+  const form = new FormData();
+  form.append('value', textValue);
+  const { data } = await api.patch(`/settings/${key}`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data;
+}
+
 export async function updateCategoryImage(key, { file, url }) {
   const form = new FormData();
   if (file) form.append('file', file);

@@ -1,20 +1,21 @@
-const HANDLE = import.meta.env.VITE_INSTAGRAM_HANDLE || 'reesha_wears31';
+const DEFAULT_HANDLE = import.meta.env.VITE_INSTAGRAM_HANDLE || 'reesha_wears31';
+const DEFAULT_IMAGES = Array.from({ length: 6 }, (_, i) => `https://picsum.photos/seed/reesha-ig-${i}/400/400`);
 
-export default function InstagramFeed() {
-  const url = `https://instagram.com/${HANDLE}`;
+export default function InstagramFeed({ handle = DEFAULT_HANDLE, images = DEFAULT_IMAGES }) {
+  const url = `https://instagram.com/${handle}`;
   return (
     <section className="border-t border-neutral-200">
       <div className="container-x py-20">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
           <div>
             <p className="eyebrow">Latest on the gram</p>
-            <h2 className="section-title mt-2">@{HANDLE}</h2>
+            <h2 className="section-title mt-2">@{handle}</h2>
           </div>
           <a href={url} target="_blank" rel="noreferrer" className="btn-outline">Follow on Instagram</a>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {Array.from({ length: 6 }).map((_, i) => (
+          {images.map((src, i) => (
             <a
               key={i}
               href={url}
@@ -23,8 +24,8 @@ export default function InstagramFeed() {
               className="aspect-square bg-neutral-100 group relative overflow-hidden"
             >
               <img
-                src={`https://picsum.photos/seed/reesha-ig-${i}/400/400`}
-                alt={`Instagram placeholder ${i + 1}`}
+                src={src}
+                alt={`Instagram photo ${i + 1}`}
                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition duration-500"
                 loading="lazy"
               />
@@ -38,10 +39,6 @@ export default function InstagramFeed() {
             </a>
           ))}
         </div>
-
-        <p className="mt-6 text-center text-xs text-neutral-500">
-          Placeholder grid — connect your Instagram handle via <code className="bg-neutral-100 px-1">VITE_INSTAGRAM_HANDLE</code> and an embed widget (Elfsight / SnapWidget) to show real posts.
-        </p>
       </div>
     </section>
   );
