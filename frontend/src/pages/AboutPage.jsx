@@ -76,6 +76,25 @@ export default function AboutPage() {
               <dd className="mt-2 text-base sm:text-lg">Osogbo, Osun State</dd>
               <dd className="text-xs sm:text-sm text-neutral-400 mt-1">We deliver nationwide across Nigeria.</dd>
             </div>
+            <div className="border-t border-neutral-700 pt-4 sm:pt-6">
+              <dt className="text-[10px] sm:text-[11px] uppercase tracking-widest2 text-neutral-400">Social</dt>
+              <dd className="mt-2 flex flex-col gap-2">
+                <a href="https://instagram.com/reesha_wears31" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-base sm:text-lg hover:text-neutral-300">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <rect x="3" y="3" width="18" height="18" rx="4" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+                  </svg>
+                  @reesha_wears31
+                </a>
+                <a href="https://www.tiktok.com/@reesha.wears.thrift" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-base sm:text-lg hover:text-neutral-300">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+                  </svg>
+                  @reesha.wears.thrift
+                </a>
+              </dd>
+            </div>
           </dl>
         </div>
       </section>
