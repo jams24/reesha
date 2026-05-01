@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { fetchProducts, deleteProduct, setProductStock, fetchSettings, updateCategoryImage, updateSetting } from '../lib/api.js';
+import { fetchProducts, deleteProduct, setProductStock, fetchSettings, updateCategoryImage } from '../lib/api.js';
 import { formatNaira } from '../lib/whatsapp.js';
 import ProductEditor from '../components/admin/ProductEditor.jsx';
 
@@ -105,13 +105,6 @@ export default function AdminDashboardPage() {
   const [search, setSearch] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const [categoryImages, setCategoryImages] = useState(TILE_DEFAULTS);
-  const [igHandle, setIgHandle] = useState('reesha_wears31');
-  const [igHandleInput, setIgHandleInput] = useState('');
-  const [igHandleEditing, setIgHandleEditing] = useState(false);
-  const [igHandleSaving, setIgHandleSaving] = useState(false);
-  const [igImages, setIgImages] = useState(
-    Array.from({ length: 6 }, (_, i) => `https://picsum.photos/seed/reesha-ig-${i}/400/400`)
-  );
 
   const load = async () => {
     setLoading(true);
@@ -122,21 +115,13 @@ export default function AdminDashboardPage() {
       ]);
       setProducts(data.items || []);
       const merged = { ...TILE_DEFAULTS };
-      const igImgs = Array.from({ length: 6 }, (_, i) => `https://picsum.photos/seed/reesha-ig-${i}/400/400`);
       Object.entries(settings).forEach(([k, v]) => {
         if (k.startsWith('category_image_')) {
           const slug = k.replace('category_image_', '');
           if (merged[slug] !== undefined) merged[slug] = v;
-        } else if (k === 'instagram_handle') {
-          setIgHandle(v);
-          setIgHandleInput(v);
-        } else if (k.startsWith('instagram_image_')) {
-          const idx = Number(k.replace('instagram_image_', ''));
-          igImgs[idx] = v;
         }
       });
       setCategoryImages(merged);
-      setIgImages(igImgs);
     } finally {
       setLoading(false);
     }
@@ -174,23 +159,7 @@ export default function AdminDashboardPage() {
     setCategoryImages((prev) => ({ ...prev, [slug]: value }));
   };
 
-  const onIgImageSaved = (idx) => (value) => {
-    setIgImages((prev) => { const next = [...prev]; next[idx] = value; return next; });
-  };
 
-  const saveIgHandle = async () => {
-    if (!igHandleInput.trim()) return;
-    setIgHandleSaving(true);
-    try {
-      await updateSetting('instagram_handle', igHandleInput.trim());
-      setIgHandle(igHandleInput.trim());
-      setIgHandleEditing(false);
-    } catch (e) {
-      alert('Failed to save handle: ' + (e.response?.data?.error || e.message));
-    } finally {
-      setIgHandleSaving(false);
-    }
-  };
 
   const onSaved = (saved, wasEditing) => {
     const savedId = saved._id || saved.id;
@@ -412,58 +381,6 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Instagram section */}
-        <div className="border-t border-neutral-200 pt-10">
-          <p className="eyebrow">Homepage</p>
-          <h2 className="section-title mt-1">Instagram section</h2>
-          <p className="text-xs sm:text-sm text-neutral-500 mt-1 mb-6">
-            Set the handle and upload up to 6 preview photos for the "Latest on the gram" grid.
-          </p>
-
-          {/* Handle editor */}
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
-            <label className="text-xs uppercase tracking-widest2 text-neutral-500 shrink-0">Instagram handle</label>
-            {igHandleEditing ? (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-neutral-400">@</span>
-                <input
-                  type="text"
-                  value={igHandleInput}
-                  onChange={(e) => setIgHandleInput(e.target.value)}
-                  className="border border-neutral-300 px-3 py-1.5 text-sm focus:outline-none focus:border-ink w-48"
-                  placeholder="reesha_wears31"
-                  onKeyDown={(e) => { if (e.key === 'Enter') saveIgHandle(); if (e.key === 'Escape') setIgHandleEditing(false); }}
-                  autoFocus
-                />
-                <button onClick={saveIgHandle} disabled={igHandleSaving} className="px-3 py-1.5 bg-ink text-paper text-[11px] uppercase tracking-widest2 disabled:opacity-50">
-                  {igHandleSaving ? 'Saving…' : 'Save'}
-                </button>
-                <button onClick={() => { setIgHandleEditing(false); setIgHandleInput(igHandle); }} className="text-xs text-neutral-500 hover:text-ink">Cancel</button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-medium">@{igHandle}</span>
-                <button onClick={() => { setIgHandleEditing(true); setIgHandleInput(igHandle); }} className="text-[11px] uppercase tracking-widest2 text-neutral-500 hover:text-ink border border-neutral-300 px-2 py-1">
-                  Edit
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* IG photo grid */}
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-            {igImages.map((url, i) => (
-              <SettingImageCard
-                key={i}
-                settingKey={`instagram_image_${i}`}
-                label={`Photo ${i + 1}`}
-                currentUrl={url}
-                square
-                onSaved={onIgImageSaved(i)}
-              />
-            ))}
-          </div>
-        </div>
       </div>
 
       <ProductEditor

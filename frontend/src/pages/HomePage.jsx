@@ -4,7 +4,6 @@ import clsx from 'clsx';
 import Hero from '../components/Hero.jsx';
 import CategoryPills, { CATEGORIES } from '../components/CategoryPills.jsx';
 import ProductGrid from '../components/ProductGrid.jsx';
-import InstagramFeed from '../components/InstagramFeed.jsx';
 import { fetchProducts, fetchSettings } from '../lib/api.js';
 
 const CATEGORY_TILES = CATEGORIES.filter((c) => c.slug !== 'all').slice(0, 5);
@@ -21,8 +20,6 @@ export default function HomePage() {
   const [featured, setFeatured] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tileImages, setTileImages] = useState(TILE_DEFAULTS);
-  const [igHandle, setIgHandle] = useState('');
-  const [igImages, setIgImages] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -41,20 +38,13 @@ export default function HomePage() {
         if (!cancelled) {
           setFeatured(items);
           const merged = { ...TILE_DEFAULTS };
-          const igImgs = [];
           Object.entries(settings).forEach(([k, v]) => {
             if (k.startsWith('category_image_')) {
               const slug = k.replace('category_image_', '');
               if (merged[slug] !== undefined) merged[slug] = v;
-            } else if (k === 'instagram_handle') {
-              setIgHandle(v);
-            } else if (k.startsWith('instagram_image_')) {
-              const idx = Number(k.replace('instagram_image_', ''));
-              igImgs[idx] = v;
             }
           });
           setTileImages(merged);
-          if (igImgs.some(Boolean)) setIgImages(igImgs);
         }
       } catch (e) {
         console.warn('Could not load products:', e.message);
@@ -139,8 +129,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      <InstagramFeed handle={igHandle || undefined} images={igImages.length ? igImages : undefined} />
     </div>
   );
 }
